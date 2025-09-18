@@ -25,7 +25,7 @@ export async function refreshAccessToken(token: ExtendedToken): Promise<Extended
       accessTokenExpires: Date.now() + (body.expires_in ?? 3600) * 1000,
       refreshToken: body.refresh_token ?? token.refreshToken,
     };
-  } catch (error) {
+  } catch {
     throw new Error("Failed to refresh Spotify access token");
   }
 }

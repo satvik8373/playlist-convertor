@@ -29,8 +29,9 @@ export default function Home() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to fetch playlist");
       setRows(json.tracks || []);
-    } catch (e: any) {
-      setError(e.message || "Unknown error");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      setError(message);
     } finally {
       setLoading(false);
     }

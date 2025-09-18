@@ -1,4 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import type { Account, Session } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import { refreshAccessToken, ExtendedToken } from "@/lib/spotify";
 
@@ -21,36 +23,37 @@ export const authOptions: NextAuthOptions = {
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account }: { token: JWT & { spotify?: ExtendedToken; error?: string }; account?: Account | null }) {
       // First sign in
-      if (account && account.access_token && account.refresh_token) {
+      if (account && (account as unknown as { access_token?: string; refresh_token?: string; expires_in?: number }).access_token && (account as unknown as { refresh_token?: string }).refresh_token) {
+        const raw = account as unknown as { access_token: string; refresh_token: string; expires_in?: number };
         const extended: ExtendedToken = {
-          accessToken: account.access_token as string,
-          accessTokenExpires: Date.now() + (account.expires_in as number) * 1000,
-          refreshToken: account.refresh_token as string,
+          accessToken: raw.access_token,
+          accessTokenExpires: Date.now() + (raw.expires_in ?? 3600) * 1000,
+          refreshToken: raw.refresh_token,
         };
         return { ...token, spotify: extended };
       }
 
       // Subsequent calls, check expiry
-      const current = (token as any).spotify as ExtendedToken | undefined;
+      const current = token.spotify as ExtendedToken | undefined;
       if (!current) return token;
       if (Date.now() < current.accessTokenExpires - 15_000) {
         return token; // still valid
       }
       try {
         const refreshed = await refreshAccessToken(current);
-        return { ...token, spotify: refreshed };
+        return { ...token, spotify: refreshed } as JWT & { spotify: ExtendedToken };
       } catch {
-        return { ...token, error: "RefreshAccessTokenError" };
+        return { ...token, error: "RefreshAccessTokenError" } as JWT & { error: string };
       }
     },
-    async session({ session, token }) {
-      const spotify = (token as any).spotify as ExtendedToken | undefined;
+    async session({ session, token }: { session: Session & { spotify?: ExtendedToken; error?: string }; token: JWT & { spotify?: ExtendedToken; error?: string } }) {
+      const spotify = token.spotify;
       if (spotify) {
-        (session as any).spotify = spotify;
+        session.spotify = spotify;
       }
-      (session as any).error = (token as any).error;
+      session.error = token.error;
       return session;
     },
   },
