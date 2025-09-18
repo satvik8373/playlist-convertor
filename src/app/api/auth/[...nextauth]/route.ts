@@ -10,6 +10,7 @@ const scopes = [
 ].join(" ");
 
 export const authOptions: NextAuthOptions = {
+  trustHost: true,
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
@@ -22,6 +23,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
+  logger: {
+    error(code, metadata) {
+      console.error("[next-auth][error]", code, metadata);
+    },
+    warn(code) {
+      console.warn("[next-auth][warn]", code);
+    },
+  },
   callbacks: {
     async jwt({ token, account }: { token: JWT & { spotify?: ExtendedToken; error?: string }; account?: Account | null }) {
       // First sign in
@@ -61,6 +70,7 @@ export const authOptions: NextAuthOptions = {
     signIn: "/", // keep the app simple; sign-in button on home
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development" || process.env.VERCEL_ENV !== undefined,
 };
 
 export const runtime = "nodejs";
