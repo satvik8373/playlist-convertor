@@ -16,11 +16,6 @@ const nextConfig: NextConfig = {
       }
     ];
   },
-  // Hint: ensure Node.js runtime on Vercel for NextAuth routes
-  auth: {
-    provider: "authjs",
-    enableWebCrypto: false
-  } as any
 };
 
 export default nextConfig;

@@ -10,7 +10,6 @@ const scopes = [
 ].join(" ");
 
 export const authOptions: NextAuthOptions = {
-  trustHost: true,
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
