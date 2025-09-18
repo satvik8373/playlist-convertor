@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Proxy /api/callback to NextAuth's Spotify callback to satisfy custom redirect URIs
 export async function GET(req: NextRequest) {
