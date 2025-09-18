@@ -12,6 +12,7 @@ type TrackItem = {
   externalUrl: string | null;
 };
 
+export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const idParam = searchParams.get("id") || searchParams.get("playlistId") || "";
