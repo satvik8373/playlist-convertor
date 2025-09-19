@@ -1,5 +1,5 @@
 "use client";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useCallback, useMemo, useState } from "react";
 import Papa from "papaparse";
 

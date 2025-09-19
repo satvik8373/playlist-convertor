@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       hasSession: !!session,
       sessionKeys: session ? Object.keys(session) : [],
-      hasSpotify: !!(session as any)?.spotify,
-      hasAccessToken: !!(session as any)?.spotify?.accessToken,
+      hasSpotify: !!(session as { spotify?: { accessToken?: string } })?.spotify,
+      hasAccessToken: !!(session as { spotify?: { accessToken?: string } })?.spotify?.accessToken,
       session: session,
       headers: Object.fromEntries(req.headers.entries())
     });
