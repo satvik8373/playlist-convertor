@@ -82,13 +82,15 @@ export default function Home() {
           <button className="text-sm underline" onClick={() => signOut()}>Sign out</button>
         ) : (
           <button 
-            className="text-sm underline" 
-            onClick={() => {
-              console.log("Attempting to sign in with Spotify...");
-              signIn("spotify", { 
-                callbackUrl: window.location.origin,
-                redirect: true 
-              });
+            className="text-sm underline hover:text-blue-600 cursor-pointer" 
+            onClick={(e) => {
+              e.preventDefault();
+              console.log("Button clicked - attempting to sign in with Spotify...");
+              console.log("Current URL:", window.location.href);
+              console.log("Origin:", window.location.origin);
+              
+              // Try direct redirect first
+              window.location.href = "/api/auth/signin/spotify";
             }}
           >
             Sign in with Spotify
