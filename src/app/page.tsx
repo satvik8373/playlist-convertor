@@ -21,10 +21,16 @@ export default function Home() {
   const isAuthed = !!session?.spotify?.accessToken;
 
   const handleFetch = useCallback(async () => {
+    if (!isAuthed) {
+      setError("Please sign in with Spotify first");
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     setRows([]);
     try {
+      console.log("Fetching playlist:", input);
       const res = await fetch(`/api/playlist?id=${encodeURIComponent(input)}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to fetch playlist");
@@ -35,7 +41,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [input]);
+  }, [input, isAuthed]);
 
   const csv = useMemo(() => {
     if (!rows.length) return "";
@@ -75,7 +81,15 @@ export default function Home() {
         ) : isAuthed ? (
           <button className="text-sm underline" onClick={() => signOut()}>Sign out</button>
         ) : (
-          <button className="text-sm underline" onClick={() => signIn("spotify")}>Sign in with Spotify</button>
+          <button 
+            className="text-sm underline" 
+            onClick={() => {
+              console.log("Attempting to sign in with Spotify...");
+              signIn("spotify", { callbackUrl: "/" });
+            }}
+          >
+            Sign in with Spotify
+          </button>
         )}
       </header>
 
