@@ -21,12 +21,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  debug: true,
   session: { strategy: "jwt" },
-  // Validate required env vars at startup
-  ...(process.env.NEXTAUTH_SECRET ? {} : { 
-    secret: "MISSING_NEXTAUTH_SECRET_ENV_VAR" 
-  }),
   logger: {
     error(code, metadata) {
       console.error("[next-auth][error]", code, metadata);
