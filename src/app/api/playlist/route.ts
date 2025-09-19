@@ -15,17 +15,21 @@ type TrackItem = {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const idParam = searchParams.get("id") || searchParams.get("playlistId") || "";
-  const playlistId = parsePlaylistId(idParam || "");
-  if (!playlistId) {
-    return NextResponse.json({ error: "Invalid playlist URL or ID" }, { status: 400 });
-  }
+  try {
+    const { searchParams } = new URL(req.url);
+    const idParam = searchParams.get("id") || searchParams.get("playlistId") || "";
+    const playlistId = parsePlaylistId(idParam || "");
+    if (!playlistId) {
+      return NextResponse.json({ error: "Invalid playlist URL or ID" }, { status: 400 });
+    }
 
-  const session = (await getServerSession(authOptions)) as (Session & { spotify?: ExtendedToken }) | null;
-  if (!session || !session.spotify?.accessToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    console.log("[playlist-api] Fetching session...");
+    const session = (await getServerSession(authOptions)) as (Session & { spotify?: ExtendedToken }) | null;
+    console.log("[playlist-api] Session:", { hasSession: !!session, hasSpotify: !!session?.spotify, hasToken: !!session?.spotify?.accessToken });
+    
+    if (!session || !session.spotify?.accessToken) {
+      return NextResponse.json({ error: "Unauthorized - please sign in with Spotify first" }, { status: 401 });
+    }
 
   const accessToken = session.spotify.accessToken;
   const client = createSpotifyClient(accessToken);
@@ -53,6 +57,10 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ id: playlistId, count: tracks.length, tracks });
+  } catch (error) {
+    console.error("[playlist-api] Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 
