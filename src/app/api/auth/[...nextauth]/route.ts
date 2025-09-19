@@ -22,7 +22,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
-  trustHost: true,
   logger: {
     error(code, metadata) {
       console.error("[next-auth][error]", code, metadata);
