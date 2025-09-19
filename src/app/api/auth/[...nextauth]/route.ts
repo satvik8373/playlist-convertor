@@ -21,6 +21,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  debug: true,
   session: { strategy: "jwt" },
   // Validate required env vars at startup
   ...(process.env.NEXTAUTH_SECRET ? {} : { 

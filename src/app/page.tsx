@@ -83,9 +83,17 @@ export default function Home() {
         ) : (
           <button 
             className="text-sm underline" 
-            onClick={() => {
+            onClick={async () => {
               console.log("Attempting to sign in with Spotify...");
-              signIn("spotify", { callbackUrl: "/" });
+              try {
+                const result = await signIn("spotify", { 
+                  callbackUrl: "/",
+                  redirect: true 
+                });
+                console.log("Sign in result:", result);
+              } catch (error) {
+                console.error("Sign in error:", error);
+              }
             }}
           >
             Sign in with Spotify
