@@ -25,17 +25,29 @@ export async function GET(req: NextRequest) {
 
     console.log("[playlist-api] Fetching session...");
     const session = (await getServerSession(authOptions)) as (Session & { spotify?: ExtendedToken }) | null;
-    console.log("[playlist-api] Session:", { 
+    console.log("[playlist-api] Raw session:", session);
+    console.log("[playlist-api] Session details:", { 
       hasSession: !!session, 
       hasSpotify: !!session?.spotify, 
       hasToken: !!session?.spotify?.accessToken,
       sessionKeys: session ? Object.keys(session) : [],
-      spotifyKeys: session?.spotify ? Object.keys(session.spotify) : []
+      spotifyKeys: session?.spotify ? Object.keys(session.spotify) : [],
+      accessTokenLength: session?.spotify?.accessToken?.length || 0
     });
     
-    if (!session || !session.spotify?.accessToken) {
-      console.log("[playlist-api] No valid session found");
-      return NextResponse.json({ error: "Unauthorized - please sign in with Spotify first" }, { status: 401 });
+    if (!session) {
+      console.log("[playlist-api] No session found");
+      return NextResponse.json({ error: "No session found - please sign in with Spotify first" }, { status: 401 });
+    }
+    
+    if (!session.spotify) {
+      console.log("[playlist-api] No spotify data in session");
+      return NextResponse.json({ error: "No Spotify data in session - please sign in with Spotify first" }, { status: 401 });
+    }
+    
+    if (!session.spotify.accessToken) {
+      console.log("[playlist-api] No access token in spotify data");
+      return NextResponse.json({ error: "No access token - please sign in with Spotify first" }, { status: 401 });
     }
 
   const accessToken = session.spotify.accessToken;
