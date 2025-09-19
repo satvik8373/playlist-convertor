@@ -22,6 +22,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
+  useSecureCookies: process.env.NODE_ENV === "production",
   logger: {
     error(code, metadata) {
       console.error("[next-auth][error]", code, metadata);

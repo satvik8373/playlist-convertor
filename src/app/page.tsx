@@ -1,5 +1,5 @@
 "use client";
-import { signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useCallback, useMemo, useState } from "react";
 import Papa from "papaparse";
 
@@ -85,7 +85,10 @@ export default function Home() {
             className="text-sm underline" 
             onClick={() => {
               console.log("Attempting to sign in with Spotify...");
-              window.location.href = "/api/auth/signin/spotify";
+              signIn("spotify", { 
+                callbackUrl: window.location.origin,
+                redirect: true 
+              });
             }}
           >
             Sign in with Spotify
